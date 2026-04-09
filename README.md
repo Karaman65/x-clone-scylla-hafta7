@@ -1,7 +1,7 @@
 # X Clone with ScyllaDB
 
 **Öğrenci:** Ahmet Karaman  
-**Okul No:** 2021039795352
+**Okul No:** 23080410029
 
 ---
 
