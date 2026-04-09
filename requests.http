@@ -1,0 +1,166 @@
+### X Clone API — Test Requests
+### VS Code REST Client / IntelliJ HTTP Client formatı
+
+@base = http://localhost:3000
+
+### ============ HEALTH ============
+
+### Sağlık kontrolü
+GET {{base}}/health
+
+### ============ USER & AUTH ============
+
+### Kullanıcı kayıt — Alice
+POST {{base}}/register
+Content-Type: application/json
+
+{
+  "username": "alice",
+  "display_name": "Alice Wonderland",
+  "bio": "Curiouser and curiouser!"
+}
+
+### Kullanıcı kayıt — Bob
+POST {{base}}/register
+Content-Type: application/json
+
+{
+  "username": "bob",
+  "display_name": "Bob Builder",
+  "bio": "Can we fix it? Yes we can!"
+}
+
+### Kullanıcı kayıt — Charlie
+POST {{base}}/register
+Content-Type: application/json
+
+{
+  "username": "charlie",
+  "display_name": "Charlie Brown"
+}
+
+### Duplicate username testi (409 beklenir)
+POST {{base}}/register
+Content-Type: application/json
+
+{
+  "username": "alice",
+  "display_name": "Another Alice"
+}
+
+### Eksik alan testi (400 beklenir)
+POST {{base}}/register
+Content-Type: application/json
+
+{
+  "username": "test"
+}
+
+### Kullanıcı profili
+GET {{base}}/users/alice
+
+### Olmayan kullanıcı (404 beklenir)
+GET {{base}}/users/nonexistent
+
+### Tüm kullanıcılar
+GET {{base}}/allusers
+
+### ============ TWEETS ============
+
+### Tweet at (alice_user_id'yi register response'dan alın)
+POST {{base}}/tweets
+Content-Type: application/json
+
+{
+  "user_id": "ALICE_USER_ID_HERE",
+  "content": "Merhaba dünya! Bu benim ilk tweet'im #scylladb #nosql"
+}
+
+### Hashtag'li tweet
+POST {{base}}/tweets
+Content-Type: application/json
+
+{
+  "user_id": "ALICE_USER_ID_HERE",
+  "content": "ScyllaDB ile wide-column store öğreniyorum #scylladb #database #learning"
+}
+
+### Tweet uzunluk testi (max 280 karakter)
+POST {{base}}/tweets
+Content-Type: application/json
+
+{
+  "user_id": "ALICE_USER_ID_HERE",
+  "content": "Bu tweet tam 280 karakterden uzun olmalı ki hata versin. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat dolor"
+}
+
+### Kullanıcının tweet'leri
+GET {{base}}/users/alice/tweets
+
+### Kullanıcının tweet'leri (pagination)
+GET {{base}}/users/alice/tweets?limit=5
+
+### ============ FOLLOW ============
+
+### Bob, Alice'i takip etsin
+POST {{base}}/follow
+Content-Type: application/json
+
+{
+  "follower_id": "BOB_USER_ID_HERE",
+  "followee_id": "ALICE_USER_ID_HERE"
+}
+
+### Charlie, Alice'i takip etsin
+POST {{base}}/follow
+Content-Type: application/json
+
+{
+  "follower_id": "CHARLIE_USER_ID_HERE",
+  "followee_id": "ALICE_USER_ID_HERE"
+}
+
+### Kendini takip etme testi (400 beklenir)
+POST {{base}}/follow
+Content-Type: application/json
+
+{
+  "follower_id": "ALICE_USER_ID_HERE",
+  "followee_id": "ALICE_USER_ID_HERE"
+}
+
+### Takip edilenler
+GET {{base}}/users/bob/following
+
+### Takipçiler
+GET {{base}}/users/alice/followers
+
+### ============ TIMELINE ============
+
+### Home timeline (Bob'un — Alice'i takip ederse Alice'in tweet'lerini görür)
+GET {{base}}/timeline/BOB_USER_ID_HERE
+
+### Home timeline (pagination)
+GET {{base}}/timeline/BOB_USER_ID_HERE?limit=10
+
+### ============ LIKES ============
+
+### Tweet beğen
+POST {{base}}/tweets/TWEET_ID_HERE/like
+
+### Tweet beğen (tekrar — counter artmalı)
+POST {{base}}/tweets/TWEET_ID_HERE/like
+
+### Beğeni sayısı
+GET {{base}}/tweets/TWEET_ID_HERE/likes
+
+### ============ HASHTAGS ============
+
+### Bugünün hashtag tweet'leri
+GET {{base}}/hashtags/scylladb
+
+### Belirli bir günün hashtag tweet'leri
+GET {{base}}/hashtags/scylladb?date=2026-04-09
+
+### Olmayan hashtag
+GET {{base}}/hashtags/nonexistent

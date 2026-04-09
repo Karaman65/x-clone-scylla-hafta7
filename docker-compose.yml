@@ -1,0 +1,47 @@
+services:
+  scylla:
+    image: scylladb/scylla:latest
+    container_name: xclone-scylla
+    command: --smp 1 --memory 512M --overprovisioned 1
+    ports:
+      - "9042:9042"
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "DESCRIBE KEYSPACES"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+    volumes:
+      - scylla-data:/var/lib/scylla
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: xclone-backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      scylla:
+        condition: service_healthy
+    environment:
+      - SCYLLA_HOSTS=scylla
+      - SCYLLA_KEYSPACE=xclone
+      - PORT=3000
+    volumes:
+      - ./schema.cql:/app/schema.cql:ro
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: xclone-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  scylla-data:

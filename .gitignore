@@ -1,0 +1,26 @@
+# Environment
+.env
+.env.local
+*.log
+.DS_Store
+
+# Node.js
+node_modules/
+dist/
+coverage/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Go
+*.exe
+*.test
+
+# IDE
+.idea/
+.vscode/
+
+# Docker volumes
+scylla-data/
